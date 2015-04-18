@@ -5,9 +5,9 @@
  */
 package Entity;
 
-import edu.moravian.GameMap;
-import edu.moravian.components.Collider;
-import edu.moravian.graphics.AnimationManager;
+
+import Components.Collider;
+import Graphics.AnimationManager;
 import Math.Point2D;
 import Math.Vector2D;
 import org.newdawn.slick.Animation;
