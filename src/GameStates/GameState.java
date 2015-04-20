@@ -1,15 +1,15 @@
 package GameStates;
 
-
 import Entity.AgentEntity;
 import Entity.EntityManager;
+import Graphics.GUI;
 import Graphics.GameMap;
 import Math.CoordinateTranslator;
 import Math.Point2D;
+import java.awt.Rectangle;
 import org.newdawn.slick.*;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
-import org.newdawn.slick.tiled.TiledMap;
 
 public class GameState extends BasicGameState
 {
@@ -23,28 +23,34 @@ public class GameState extends BasicGameState
     private EntityManager entM;
     private GameMap map;
     private CoordinateTranslator corT;
- 
+    private GUI gUI;
 
     @Override
     public void init(GameContainer gc, StateBasedGame gm) throws SlickException
     {
-        corT = new CoordinateTranslator(SWidth,SHeight,100,100,new Point2D(0,0));
-        map = new GameMap("TDMap.tmx",100,100,SWidth,SHeight);
+        corT = new CoordinateTranslator(SWidth, SHeight, 100, 100, new Point2D(0, 0));
+        map = new GameMap("TDMap.tmx", 100, 100, SWidth, SHeight);
         entM = new EntityManager();
-        agent = new AgentEntity(72.5,0,"Clyde");
+        agent = new AgentEntity(72.5, 0, "Clyde");
         entM.addEnt(agent);
-        anim =  new Animation();
+        anim = new Animation();
+        gUI = new GUI(corT);
     }
 
     /* Render entities and the map*/
     @Override
     public void render(GameContainer gc, StateBasedGame gm, Graphics g) throws SlickException
     {
-        map.render(g, new Point2D(0,0));
+
+        map.render(g, new Point2D(0, 0));
+        for (Rectangle r : map.getFreeRect())
+        {
+            g.drawRect(r.x, r.y, r.width, r.height);
+        }
+
         anim = agent.getAnimation();
-        anim.draw((float)corT.worldToScreen(agent.getPosition()).getX(), (float)corT.worldToScreen(agent.getPosition()).getY());
-        
-       
+        anim.draw((float) corT.worldToScreen(agent.getPosition()).getX(), (float) corT.worldToScreen(agent.getPosition()).getY());
+        gUI.render(g);
 
     }
 
@@ -52,7 +58,8 @@ public class GameState extends BasicGameState
     @Override
     public void update(GameContainer gc, StateBasedGame gm, int t) throws SlickException
     {
-      entM.updateEnts(gc, t);
+        entM.updateEnts(gc, t);
+        gUI.update(gc, t);
 
     }
 

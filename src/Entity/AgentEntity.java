@@ -9,7 +9,6 @@ import Graphics.AnimationManager;
 import Math.Point2D;
 import Math.Vector2D;
 import java.util.LinkedList;
-import java.util.Queue;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.SlickException;
@@ -27,7 +26,9 @@ public class AgentEntity extends Entity
     private int speed;
     private int hp;
     private LinkedList<Point2D> path;
+    private LinkedList<Point2D> backtrack;
     private Point2D currentTargetP;
+    private boolean isBacktracking;
 
     /**
      * Create an AgentEntity at location (x,y).
@@ -45,7 +46,9 @@ public class AgentEntity extends Entity
         animM = new AnimationManager();
         anim = animM.setAnimation(type);
         path = new LinkedList<>();
+        backtrack = new LinkedList<>();
         speed = 20;
+        isBacktracking = false;
         generatePath();
 
     }
@@ -62,8 +65,8 @@ public class AgentEntity extends Entity
     @Override
     public void update(GameContainer gc, int t) throws SlickException
     {
-        System.out.println("Position: " + position);
-        if (!path.isEmpty() && !(isAgentNear(this, path.getFirst())))
+
+        if (!isBacktracking && !path.isEmpty() && !(isAgentNear(this, path.getFirst())))
         {
             Vector2D dist = path.getFirst().minus(this.position);
             dist.normalize();
@@ -74,10 +77,41 @@ public class AgentEntity extends Entity
             position.set(newPos);
         }
 
-        if (!path.isEmpty() && isAgentNear(this, path.getFirst()))
+        if (isBacktracking && !backtrack.isEmpty() && !isAgentNear(this, backtrack.getFirst()))
         {
+            Vector2D dist = backtrack.getFirst().minus(this.position);
+            dist.normalize();
+
+            double nX = position.getX() + dist.getX() * speed * t / 1000;
+            double nY = position.getY() + dist.getY() * speed * t / 1000;
+            Point2D newPos = new Point2D(nX, nY);
+            position.set(newPos);
+        }
+
+        if (!isBacktracking && !path.isEmpty() && isAgentNear(this, path.getFirst()))
+        {
+            backtrack.addFirst(path.getFirst());
             path.remove();
         }
+
+        if (isBacktracking && !backtrack.isEmpty() && isAgentNear(this, backtrack.getFirst()))
+        {
+            path.addFirst(backtrack.getFirst());
+            backtrack.remove();
+        }
+
+        if (isBacktracking && backtrack.isEmpty())
+        {
+            isBacktracking = false;
+            //Collections.reverse(path);
+        }
+        
+        if (!isBacktracking && path.isEmpty())
+        {
+            isBacktracking = true;
+            //Collections.reverse(backtrack);
+        }
+
     }
 
     public Animation getAnimation()
@@ -90,13 +124,13 @@ public class AgentEntity extends Entity
         path.add(new Point2D(72.5, 11.43));
         path.add(new Point2D(92, 11.43));
         path.add(new Point2D(92, 37.14));
-        path.add(new Point2D(12.5,37.14));
-        path.add(new Point2D(12.5,51.43));
-        path.add(new Point2D(92,51.43));
-        path.add(new Point2D(92,82.86));
-        path.add(new Point2D(25,82.86));
-        path.add(new Point2D(22.5,77));
-        path.add(new Point2D(15,77));
+        path.add(new Point2D(12.5, 37.14));
+        path.add(new Point2D(12.5, 51.43));
+        path.add(new Point2D(92, 51.43));
+        path.add(new Point2D(92, 82.86));
+        path.add(new Point2D(25, 82.86));
+        path.add(new Point2D(22.5, 77));
+        path.add(new Point2D(15, 77));
     }
 
     public boolean isAgentNear(AgentEntity a, Point2D dest)

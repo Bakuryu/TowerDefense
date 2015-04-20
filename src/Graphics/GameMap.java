@@ -19,6 +19,7 @@ public class GameMap
     private final TiledMap map;
     private boolean blocked[][];
     private ArrayList<Rectangle> blocks;
+    private ArrayList<Rectangle> free;
     private final int mapWidth;
     private final int mapHeight;
     private final int numTilesX;
@@ -35,12 +36,12 @@ public class GameMap
             int screenWidth, int screenHeight)
             throws SlickException
     {
-        map = new TiledMap("res/"+filename);
-
+        map = new TiledMap("res/" + filename);
 
         tileWidth = map.getTileWidth();
         tileHeight = map.getTileHeight();
         blocks = new ArrayList<>();
+        free = new ArrayList<>();
         mapWidth = tileWidth * map.getWidth();
         mapHeight = tileHeight * map.getHeight();
 
@@ -115,7 +116,12 @@ public class GameMap
 
                     // And create the collision Rectangle
                     Point2D wP = (convertFromTileCord(i, j));
-                    blocks.add(new Rectangle((int) wP.getX(), (int) wP.getY(), tileWidth, tileHeight));
+                    blocks.add(new Rectangle(i * tileWidth, j * tileHeight, tileWidth, tileHeight));
+                }
+
+                if (value.equals("false"))
+                {
+                    free.add(new Rectangle(i * tileWidth, j * tileHeight, tileWidth, tileHeight));
                 }
 
             }
@@ -123,11 +129,14 @@ public class GameMap
     }
     /* Returns list of blocks on the map that are collidable*/
 
-
-
-    public ArrayList<Rectangle> getRect()
+    public ArrayList<Rectangle> getBlocRect()
     {
         return blocks;
+    }
+
+    public ArrayList<Rectangle> getFreeRect()
+    {
+        return free;
     }
 
     public boolean[][] getBlocked()
@@ -143,11 +152,11 @@ public class GameMap
     private Point2D convertFromTileCord(int x, int y)
     {
         double wX = 0;
-        if (x != 99)
+        if (x != 39)
         {
-            wX = x * 3;
+            wX = x * 2.5;
         }
-        double wY = (300 - (y * 3));
+        double wY = (100 - (y * 100/35));
 
         Point2D worldPoint = new Point2D(wX, wY);
         return worldPoint;
