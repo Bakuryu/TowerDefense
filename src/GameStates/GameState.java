@@ -60,6 +60,7 @@ public class GameState extends BasicGameState
     {
         entM.updateEnts(gc, t);
         gUI.update(gc, t);
+        System.out.println("DeltaTime: " + t);
 
     }
 
